@@ -13,7 +13,10 @@ class CUDApiView(APIView):
     def post(self,request):
         try:
             data = request.data
-            serializer = CompanySerializer(data=data)
+            try:
+                serializer = CompanySerializer(data=data)
+            except Exception as e:
+                return Response({'message':"Error while serializing"},status=status.HTTP_400_BAD_REQUEST)
             if not serializer.is_valid():
                 return Response({'message':serializer.errors},status=status.HTTP_406_NOT_ACCEPTABLE)
             serializer.save()
@@ -24,10 +27,10 @@ class GetCompanyByIDApiView(APIView):
     def get(self,request,id):
         try:
             company = Company.objects.get(id=id)
-            serializer = CompanySerializer(data=company)
-            if not serializer.is_valid():
-                return Response({'message':serializer.errors},status=status.HTTP_406_NOT_ACCEPTABLE)
+            serializer = CompanySerializer(company)#no data argument to be passed
+            #no is_valid() to do
             return Response(serializer.data)
+        
         except Exception as e:
             return Response({'message':"Something went wrong"},status=status.HTTP_400_BAD_REQUEST)
             
@@ -35,13 +38,13 @@ class GetCompanyByIDApiView(APIView):
 class GetAllCompaniesApiView(APIView):
     def get(self,request) :
         try:
-            companies = Company.objects.all()
-            page_number =  request.data.get('page',1)
+            comps = Company.objects.all().order_by('company_name')
+            page_number =  request.GET.get('page',1)
             page_size = 2
-            paginator = Paginator(companies,page_size)
+            paginator = Paginator(comps,page_size)
+            
             serializer = CompanySerializer(paginator.page(page_number),many=True)
-            if not serializer.is_valid():
-                return Response({'message':serializer.errors},status=status.HTTP_406_NOT_ACCEPTABLE)
+            #no is_valid() to do
             return Response(serializer.data)
         except Exception as e:
             return Response({'message':"Something went wrong"},status=status.HTTP_400_BAD_REQUEST)
