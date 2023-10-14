@@ -32,7 +32,7 @@ class GetCompanyByIDApiView(APIView):
             return Response(serializer.data)
         
         except Exception as e:
-            return Response({'message':"Something went wrong"},status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message':"Record of that ID doesn't exist"},status=status.HTTP_400_BAD_REQUEST)
             
 
 class GetAllCompaniesApiView(APIView):
