@@ -1,4 +1,3 @@
-# to_messages
 A REST api written in Django for basic CRUD operations utilizing basic field validations
 
 ## Technologies used
